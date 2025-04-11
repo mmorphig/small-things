@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Get total and used memory in MB
+total_mem=$(free -m | awk '/^Mem:/ {print $2}')
+used_mem=$(free -m | awk '/^Mem:/ {print $3}')
+
+# Print in "USED M / TOTAL M" format
+echo "Memory usage: $used_mem M / $total_mem M"
+

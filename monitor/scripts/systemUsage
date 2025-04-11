@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Run all custom scripts and print results
+echo "CPU  %usr  %sys  %idle"
+bash ./customScripts/cpuUsage
+
+echo "CPU Temp:"
+bash ./customScripts/cpuTemp
+
+bash ./customScripts/cpuClock
+
+echo " "
+bash ./customScripts/memUsage
+
+echo " "
+echo "Network:"
+bash ./customScripts/netUsage
+
+echo " "
+bash ./customScripts/diskUsage

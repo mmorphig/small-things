@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Check if lm-sensors is installed
+if ! command -v sensors &> /dev/null
+then
+    echo "lm-sensors is not installed. Please install it first."
+    exit 1
+fi
+
+#!/bin/bash
+
+# Find all temperature input files
+temps=($(cat /sys/class/hwmon/hwmon*/temp*_input 2>/dev/null))
+
+# Check if any temperatures were found
+if [[ ${#temps[@]} -gt 0 ]]; then
+    for i in "${!temps[@]}"; do
+	temp_k=$(((temps[i] / 1000)))
+        echo "C$i $temp_k C"
+    done
+else
+    echo "Error: Could not read CPU temperature."
+fi

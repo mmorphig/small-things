@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Run mpstat for 1 second, skip first 3 lines and ignore the timestamp
+mpstat -P ALL 1 1 | awk 'NR > 3 && $1 != "Average:" {print $2, $3, $5, $12}' | column -t
+

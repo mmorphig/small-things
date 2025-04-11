@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Get all local IPv4 addresses, excluding 127.0.0.1, and format with a comma and space
+ip -4 addr show | awk '/inet / && $2 !~ /^127/ {gsub(/\/.*/, "", $2); ips = (ips == "") ? $2 : ips", "$2} END {print ips}'

@@ -1,0 +1,15 @@
+# Number of agents are integers, the rest are floats
+numRedAgents:   100000
+numGreenAgents: 100000
+numBlueAgents:  00000
+decayRate: 0.97
+diffusionRate: 0.0001
+turnRate: 0.1
+sensorDistance: 5.0
+sensorRadius: 2.0
+lrSensorDistance: 2.0
+pheromoneStrength: 15.0
+avoidanceStrength: 0.1
+pheromoneSensitivity: 2.0
+freeWill: 1.5
+speed: 1.0

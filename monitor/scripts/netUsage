@@ -1,0 +1,70 @@
+#!/bin/bash
+
+# Interface to monitor (default to eth0 or auto-detect)
+IFACE=$(ip -o -4 route show to default | awk '{print $5}' | head -n 1)
+
+# Check if interface exists
+if [ -z "$IFACE" ]; then
+    echo "No network interface found."
+    exit 1
+fi
+
+# Define duration for measurement (default to 5 seconds)
+DURATION=2
+INTERVAL=1  # Interval between measurements (in seconds)
+
+# Initialize accumulators
+total_rx_diff=0
+total_tx_diff=0
+
+# Loop to measure over the defined duration
+for ((i = 0; i < DURATION; i++)); do
+    # Get initial RX and TX bytes
+    rx_before=$(cat /sys/class/net/$IFACE/statistics/rx_bytes)
+    tx_before=$(cat /sys/class/net/$IFACE/statistics/tx_bytes)
+
+    # Wait for INTERVAL seconds
+    sleep $INTERVAL
+
+    # Get RX and TX bytes after INTERVAL
+    rx_after=$(cat /sys/class/net/$IFACE/statistics/rx_bytes)
+    tx_after=$(cat /sys/class/net/$IFACE/statistics/tx_bytes)
+
+    # Calculate byte differences for this interval
+    rx_diff=$((rx_after - rx_before))
+    tx_diff=$((tx_after - tx_before))
+
+    # Accumulate differences
+    total_rx_diff=$((total_rx_diff + rx_diff))
+    total_tx_diff=$((total_tx_diff + tx_diff))
+done
+
+# Calculate average bytes per second
+rx_avg=$(awk "BEGIN {print $total_rx_diff / $DURATION}")
+tx_avg=$(awk "BEGIN {print $total_tx_diff / $DURATION}")
+
+# Convert to Kbps or Mbps
+rx_speed=$(awk "BEGIN {print ($rx_avg * 8) / 1000}")   # Kbps
+tx_speed=$(awk "BEGIN {print ($tx_avg * 8) / 1000}")   # Kbps
+
+# Format to Mbps if > 1000 Kbps
+if (( $(echo "$rx_speed > 1000" | bc -l) )); then
+    rx_speed=$(awk "BEGIN {print $rx_speed / 1000}")
+    rx_unit="Mbps"
+else
+    rx_unit="Kbps"
+fi
+
+if (( $(echo "$tx_speed > 1000" | bc -l) )); then
+    tx_speed=$(awk "BEGIN {print $tx_speed / 1000}")
+    tx_unit="Mbps"
+else
+    tx_unit="Kbps"
+fi
+
+# Display results
+#echo -e "Interface: $IFACE"
+echo -e "Public IP: $(curl -s -4 http://icanhazip.com)"
+echo -e "Local IP: $(bash ~/customScripts/localIP)"
+echo -e "Average Download: $rx_speed $rx_unit"
+echo -e "Average Upload:   $tx_speed $tx_unit"

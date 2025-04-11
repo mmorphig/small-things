@@ -1,0 +1,1 @@
+awk -F': ' '/MHz/ {sum+=$2; count++} END {if (count > 0) print "CPU Clock: " sum/count " MHz"}' /proc/cpuinfo
