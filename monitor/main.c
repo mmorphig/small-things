@@ -13,9 +13,9 @@
 typedef struct {
     int x, y;
     int width, height;
-	uint id;
-    char* data; // Text to show in the window
-    char* title;
+    uint id;
+	char* data; // Text to show in the window
+	char* title;
     int scrollDownOffset;
 } Window;
 
