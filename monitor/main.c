@@ -326,16 +326,35 @@ int create_window(int x, int y, int width, int height, char* title) {
 }
 
 void resize_windows() {
-	// Resize the screen buffer to match terminal size
+    int oldMaxTermY = maxTermY; // Save previous height
+    getmaxyx(stdscr, maxTermY, maxTermX);
+
+    // Reallocate screenBuffer pointer array
     screenBuffer = (Character**)realloc(screenBuffer, maxTermY * sizeof(Character*));
-    for (int i = 0; i < maxTermY; i++) {
-        screenBuffer[i] = (Character*)realloc(screenBuffer[i], maxTermX * sizeof(Character));
+    if (!screenBuffer) {
+        // Handle allocation failure
+        endwin();
+        fprintf(stderr, "Failed to reallocate screenBuffer rows\n");
+        exit(1);
     }
-    
-    // Clear screen buffer before redrawing
-	for (unsigned char i = 0; i < maxTermY; i++) {
-	    for (unsigned char j = 0; j < maxTermX; j++) {
-	        screenBuffer[i][j].character = 0x20; 
+
+    for (int i = 0; i < maxTermY; i++) {
+        if (i < oldMaxTermY && screenBuffer[i]) {
+            screenBuffer[i] = (Character*)realloc(screenBuffer[i], maxTermX * sizeof(Character));
+        } else {
+            screenBuffer[i] = (Character*)malloc(maxTermX * sizeof(Character));
+        }
+
+        if (!screenBuffer[i]) {
+            // Handle allocation failure
+            endwin();
+            fprintf(stderr, "Failed to allocate screenBuffer[%d]\n", i);
+            exit(1);
+        }
+
+        // Clear the line
+        for (int j = 0; j < maxTermX; j++) {
+            screenBuffer[i][j].character = 0x20;
 	    }
 	}
 	
