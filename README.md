@@ -7,4 +7,4 @@ There are some comments on what things are in the compile.sh.
 
 All the compile scripts make a build directory in here, with "mkdir ../build" and puts the executable in their own directory, fun!
 
-So far there is: monitor for a Minecraft server, slime mould simulation, hex viewer, video to ascii player, snake (very bad) and a 3D space thing.
+So far there is: monitor for a Minecraft server, slime mould simulation, hex viewer, video to ascii player, snake (very bad), mc server finder, hypercube renderer and a 3D space thing.

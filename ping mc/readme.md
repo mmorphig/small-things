@@ -1,0 +1,2 @@
+First mc server pinger I made, inspired the creation of and was translated-ish to Java for OneC (my meteor client addon). I've even given json data scanned using this to the addon for testing it.
+I have a list of 7892 mc server responses created using this, not putting that here though.
