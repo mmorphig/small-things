@@ -4,7 +4,6 @@ from mcstatus import JavaServer
 import threading
 import os
 
-# CONFIGURATION
 PORT = 25565
 OUTPUT_FILE = "minecraft_server_status_single.ndjson"
 write_lock = threading.Lock()

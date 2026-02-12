@@ -4,9 +4,10 @@ import threading
 from mcstatus import JavaServer
 import time
 from itertools import islice
+import socket
 
-BATCH_SIZE = 255
-SLEEP_BETWEEN_BATCHES = 0.5  # seconds
+BATCH_SIZE = 512
+SLEEP_BETWEEN_BATCHES = 1
 
 INPUT_FILE = "minecraft_server_status.ndjson"
 OUTPUT_FILE = "minecraft_server_status_updated.ndjson"
@@ -18,11 +19,16 @@ write_lock = threading.Lock()
 def ping_server(entry):
     ip = entry["ip"]
     try:
+        hostname = socket.getnameinfo((ip, 0), 0)
+    except:
+        hostname = ""
+    try:
         server = JavaServer(ip, PORT)
         status = server.status()
 
         result = {
             "ip": ip,
+            "hostname": hostname[0],
             "status": {
                 "online": True,
                 "motd": status.motd.to_plain(),
@@ -32,6 +38,33 @@ def ping_server(entry):
                 "latency_ms": round(status.latency, 2)
             }
         }
+
+        players_sample = []
+        try:
+            sample = None
+            if hasattr(status, "players") and hasattr(status.players, "sample"):
+                sample = status.players.sample
+
+            if not sample:
+                raw = getattr(status, "raw", None)
+                if isinstance(raw, dict):
+                    sample = raw.get("players", {}).get("sample")
+
+            if sample:
+                for p in sample:
+                    if p is None:
+                        continue
+                    if isinstance(p, dict):
+                        name = p.get("name")
+                    else:
+                        name = getattr(p, "name", None) or getattr(p, "display_name", None)
+
+                    if name:
+                        players_sample.append(name)
+        except Exception:
+            players_sample = []
+
+        result["status"]["players_sample"] = players_sample
     except Exception:
         result = {
             "ip": ip,
